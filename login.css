@@ -1,0 +1,89 @@
+.mainstyle {
+    font-size: 13px;
+    color: #333333;
+    background-color: #efefef;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    text-decoration: none;
+    padding: 0px;
+    margin: 0px;
+}
+#lg_pg {
+    top: 0px;
+    padding-top: 50px;
+}
+#leftpanel {
+    left: 0;
+    top: 50;
+    position: absolute;
+    width: 22%;
+    margin-left: 10px;
+    margin-top: 0px;
+    color: #000000;
+    background-color: #ccc;
+    padding: 20px;
+}
+li {
+    list-style-type: none;
+    white-space: nowrap;
+    margin-left: -15px;
+}
+#lg_pnl_login {
+    top: 0;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 15px;
+    border: 2px solid black;
+    margin: 0 35% 0 35%;
+    white-space: nowrap;
+}
+#lg_pnl_pass {
+    margin: 0 35% 0 35%;
+    color: #069;
+}
+#lg_pnl_first {
+    margin: 0 35% 0 35%;
+    color: #000;
+}
+#lg_pnl_msg {
+    margin: 0 35% 0 35%;
+    color: #c00;
+}
+h2 {
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    font-size: 15px;
+}
+h3 {
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+}
+a:link
+{
+    color: #006699;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    text-decoration: none;
+}
+a:hover
+{
+    color: #006699;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    text-decoration: underline;
+}
+a:active
+{
+    color: #006699;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    text-decoration: none;
+}
+.emph {
+    font-weight: bold;
+    font-style: italic;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+}
+.examp {
+    font-weight: bold;
+}
+.copyright {
+    padding-top: 30px;
+    font-size: xx-small;
+}

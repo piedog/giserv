@@ -1,0 +1,333 @@
+### ---------------------------------------------------------------------
+### $Id: mouseovers.map,v 1.1.1.1 2007/04/24 02:04:25 rob Exp $
+### $Name:  $
+### ---------------------------------------------------------------------
+MAP
+
+NAME Tulsa
+STATUS ON
+SIZE 650 450
+SYMBOLSET marker.sym
+#IMAGECOLOR 210 228 229
+#IMAGECOLOR -1 -1 -1
+FONTSET "fonts/fonts.lst"
+
+#       minx     miny     maxx    maxy
+#         W        S       E       N
+Extent -6933828.0 2281916.0 4413300.0 10142311.0
+UNITS METERS
+
+
+# Start of web interface definition
+WEB
+    IMAGEPATH /bogus/www/data/tmpdata/   # actual path is built in application
+    #temp data relative path:
+    IMAGEURL "/tmpdata/"
+    # max/min zoom:
+    MINSCALE 2000
+    MAXSCALE 54000000
+
+END # Web
+
+IMAGETYPE imagemap
+OUTPUTFORMAT
+     NAME imagemap
+     DRIVER imagemap
+     FORMATOPTION "POLYHREF=#"
+     FORMATOPTION "SYMBOLHREF=#"
+     FORMATOPTION "SUPPRESS=YES"
+     FORMATOPTION "MAPNAME=tulsamap"
+     FORMATOPTION "POLYMOUSEOUT=return out(this);"
+     FORMATOPTION "POLYMOUSEOVER=return overlib(event,'%s',this);"
+     #FORMATOPTION "SYMBOLMOUSEOUT=return nd();"
+     #FORMATOPTION "SYMBOLMOUSEOVER=return overlib('%s');"
+     MIMETYPE "text/html"
+END
+
+
+PROJECTION
+	"proj=lcc"
+   "lon_0=-100"
+   "lat_1=37"
+   "lat_2=65"
+   "ellps=GRS80"
+	#"init=epsg:26714"
+END
+
+###### Oil and Gas Regions
+LAYER
+   Name "regions"
+   Projection
+      "proj=latlong"
+   End
+   CONNECTION "user=bogus password=bogus dbname=geotest"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from regions_noga USING UNIQUE oid USING SRID=-1"
+	TEMPLATE bogus.html
+	TOLERANCE 5
+
+   Type Polygon
+   Status Off
+   METADATA
+      layertype "reference"
+      layerlabel "Oil and Gas Regions"
+   END
+   LABELITEM reg_name
+   ClassItem reg_name
+   Class
+      NAME "Colorado Plat, Basin/Range"
+      Expression /Colo.*/
+      #Color 204 255 204
+      Color 0 0 0
+      OutlineColor 0 0 0
+      Size 5
+      Symbol "hashdown"
+   End
+   Class
+      NAME "Eastern"
+      Expression /East.*/
+      Color 0 0 0
+      OutlineColor 0 0 0
+      Size 5
+      Symbol "hashvee"
+   End
+   Class
+      NAME "Gulf Coast"
+      Expression /Gulf.*/
+      Color 51 204 0
+      OutlineColor 0 0 0
+      Size 3
+      Symbol "hashdown"
+   End
+   Class
+      NAME "MMS Lease Blocks"
+      Expression /MMS.*/
+      Color 0 0 0
+      OutlineColor 0 0 0
+      Size 3
+      Symbol "hashdown"
+   End
+   Class
+      NAME "Midcontinent"
+      Expression /Mid.*/
+      Color 51 255 51
+      OutlineColor 0 0 0
+      Size 3
+      Symbol "hashdown"
+   End
+   Class
+      NAME "Pacific Coast"
+      Expression /Pac.*/
+      Color 255 204 204
+      OutlineColor 0 0 0
+      Size 3
+      Symbol "hashdown"
+   End
+   Class
+      NAME "Rocky Mtn and N. Great Plains"
+      Expression /Rock.*/
+      Color 255 153 153
+      OutlineColor 0 0 0
+      Size 3
+      Symbol "hashdown"
+   End
+   Class
+      NAME "West Texas and E. New Mexico"
+      Expression /West.*/
+   End
+END
+
+
+
+###### PLSS  Township/Range
+LAYER
+   Status Off
+   Name "twnrng"
+   METADATA
+      is_queryable "N"
+      layertype "reference"
+      layerlabel "Township/Range"
+   END
+   CONNECTION "user=bogus password=bogus dbname=geotest"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from (select oid, the_geom,
+         trim(to_char(twn_num,'999'))||twn_dir ||trim(to_char(rng_num,'999'))||rng_dir
+           as trlabel from plss_100k) as named_twnrng USING UNIQUE oid USING SRID=-1"
+   Projection
+		"proj=latlong"
+   End
+   Type Polygon
+   LabelItem "trlabel"
+   MaxScale 800000
+   LabelMaxScale 722000
+   Class
+      Name "TwnRng"
+      OutlineColor 0 205 0
+   END
+
+END
+
+###### County Outlines
+LAYER
+   Status Off
+   Name "counties"
+   Projection
+		"proj=latlong"
+   End
+   METADATA
+      is_queryable "N"
+      layertype "reference"
+      layerlabel "County Boundary"
+   END
+   CONNECTION "user=bogus password=bogus dbname=geotest"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from (select c.oid as oid, c.the_geom as the_geom,
+         f.cnty_name as county_name from counties_100k c, fips_counties f
+         where c.state_fips = f.state_n_code and c.county_fips = f.cnty_n_code)
+         as named_counties USING UNIQUE oid USING SRID=-1"
+   TYPE polygon
+   LabelItem "county_name"
+   MaxScale 25000000
+   LabelMaxScale 1400000
+   Class
+      Name "counties"
+   END
+END
+
+###### Client Seismic Lines
+LAYER
+   Status ON
+   Name "cseis"
+   CONNECTION "user=bogus password=bogus dbname=geotest host=redbud"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from (select oid as oid,
+         buffer(simplify(the_geom,.001),.0010, 2) as the_geom, line_id, seismic_contractor
+         from vw_seismic_2d)
+         as cseis USING UNIQUE oid USING SRID=-1"
+   Projection
+      "proj=latlong"
+   End
+   TYPE polygon
+   Class
+      Name "cseis"
+      OUTLINECOLOR 0 0 0
+   END
+   ##FILTERITEM   ?? Use filteritem to control which field is used as id
+   LabelItem "line_id"
+   LABELMAXSCALE 500000
+	TEMPLATE data/bogus.html
+	TOLERANCE 5
+END
+
+
+###### Streams and Rivers
+LAYER
+   Status Off
+   Name "streams"
+   METADATA
+      is_queryable "N"
+      layertype "reference"
+      layerlabel "Streams and Rivers"
+   END
+   CONNECTION "user=bogus password=bogus dbname=geotest"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from hydrogl USING UNIQUE oid USING SRID=-1"
+   Projection
+		"proj=latlong"
+   End
+   MaxScale 2260000
+   Type Line
+   LabelItem "name"
+   Filter "feature='Stream'"
+   Class
+      Name "Streams"
+      Color 0 0 255
+      LABEL
+         TYPE truetype
+         FONT luxisri
+         Position CR
+         Size 6
+         Color 0 0 255
+         MINDISTANCE 400
+         ANGLE auto
+      END
+   END
+END
+
+###### Lakes
+LAYER
+   Status Off
+   Name "lakes"
+   METADATA
+      is_queryable "N"
+      layertype "reference"
+      layerlabel "Lakes"
+   END
+   CONNECTION "user=bogus password=bogus dbname=geotest"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from hydrogp USING UNIQUE oid USING SRID=-1"
+   Projection
+		"proj=latlong"
+   End
+   MaxScale 4000000
+   Type Polygon
+   LabelItem "name"
+   Filter "feature in ('Lake','Resevoir','Stream','Canal')"
+   Class
+      Name "Lakes"
+      Color 0 0 255
+      LABEL
+         TYPE truetype
+         FONT luxisri
+         Position CR
+         Size 7
+         Color 0 0 255
+      END
+   END
+END
+
+
+###### State Outlines
+LAYER
+   STATUS DEFAULT
+   Name "states"
+   METADATA
+      is_queryable "N"
+      layertype "reference"
+      layerlabel "State Boundary"
+   END
+   CONNECTION "user=bogus password=bogus dbname=geotest"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from (select c.oid as oid, c.the_geom as the_geom,
+         f.state_name as state_name from states_100k c, fips_states f
+         where c.state_fips = f.state_n_code)
+         as named_states USING UNIQUE oid USING SRID=-1"
+   Projection
+		"proj=latlong"
+   End
+   TYPE line
+   Transparency 20
+   #LabelItem "state_name"
+   LabelMaxScale 13500000
+   Class
+      Name "states"
+      OutlineColor 0 0 0
+      #Color 239 215 200
+      COLOR -1 -1 -1
+      SYMBOL 'circle'
+      SIZE 2
+      LABEL
+         Position CC
+         Color 0 0 0
+         FONT luxisri
+         Size 11
+         TYPE truetype
+         MINDISTANCE 300
+         PARTIALS false
+      END
+   END
+END
+
+
+
+END # Map File

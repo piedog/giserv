@@ -1,0 +1,672 @@
+### ---------------------------------------------------------------------
+### $Id: tulsa.map,v 1.1.1.1 2007/04/24 02:04:20 rob Exp $
+### $Name:  $
+### ---------------------------------------------------------------------
+MAP
+
+NAME Tulsa
+STATUS ON
+SIZE 650 450
+SYMBOLSET marker.sym
+#IMAGECOLOR 210 228 229
+#IMAGECOLOR -1 -1 -1
+FONTSET "fonts/fonts.lst"
+
+#       minx     miny     maxx    maxy
+#         W        S       E       N
+Extent -6933828.0 2281916.0 4413300.0 10142311.0
+UNITS METERS
+
+
+# Start of web interface definition
+WEB
+   #LOG "/usr/local/www/data/tmpdata/zoomBoxTest.log"   ## redbud
+   #LOG "/data1/www/data/tmpdata/zoomBoxTest.log"    ## ursus
+# reference HTML file:
+  #TEMPLATE /tmpdata/bogus.html  ## ursus
+  ## For IMAGEPATH, consider using "" to indicate that path is built from IMAGEURL by application
+  ## and if IMAGEPATH is defined, then use it.
+  IMAGEPATH /bogus/www/data/tmpdata/   # actual path is built in application
+#temp data relative path:
+  IMAGEURL "/tmpdata/"
+# max/min zoom:
+  MINSCALEdenom 2000
+  MAXSCALEdenom 54000000
+
+    METADATA
+        refmappath "mapserver/giserv_php5/imagedir/"   # relative to document root
+        refmaplist "refmap.png,refmap_us.png,refmap_ak.png,refmap_hi.png"
+        refprjlist "proj=lcc lon_0=-100 lat_1=37 lat_2=65 ellps=GRS80,proj=lcc lon_0=-100 lat_1=37 lat_2=65 ellps=GRS80, proj=lcc ellps=GRS80 lon_0=-158.763195 lat_0=51.217239 lat_1=68.034579833333 lat_2=54.580707166667,proj=lcc ellps=GRS80 lon_0=-157.517315 lat_0=18.915493 lat_1=21.681243833333 lat_2=19.468643166667"
+        refxxylist "-6933828.0 2281916.0 4413300.0 10142311.0,-2203511.4 3149246.8 2809673.9 6619913.5,-1962130.2 -123406.4 1962130.2 2593389.3,-461060.3 -95408.3 349839.5 465983.9"
+        refxlllist "-190 0 180 80,-125 25 20 50,-180 59 -130 72,-165 15 -150 25"
+        transp_map "imagedir/map_blank.gif"
+        layergroups "ref=Reference Layers, s2d=2D Seismic, sol=Soil Samples (Oklahoma)"
+        mouseovers "n"   ## if Y then imagemap output and mouseover is activated
+    END
+END # Web
+
+#OUTPUTFORMAT
+#    NAME png24bit
+#    DRIVER "GD/PNG"
+#    MIMETYPE "image/png"
+#    IMAGEMODE RGBA
+#    TRANSPARENT true
+#END
+OUTPUTFORMAT
+    NAME gif
+    DRIVER "GD/GIF"
+    MIMETYPE "image/gif"
+    IMAGEMODE PC256
+    #IMAGEMODE RGBA
+    EXTENSION "gif"
+    TRANSPARENT on
+END
+
+# Start of scalebar
+SCALEBAR
+  IMAGECOLOR 255 255 255
+  LABEL
+    COLOR 0 0 0
+    SIZE tiny
+  END
+  STYLE 0
+  SIZE 500 3
+  COLOR 255 0 0
+  OUTLINECOLOR 0 0 0
+  TRANSPARENT ON
+  UNITS KILOMETERS
+  INTERVALS 5
+  STATUS ON
+END
+
+# Start of legend
+LEGEND
+  KEYSIZE 18 12
+  IMAGECOLOR 255 255 255
+  #OutlineColor 0 0 0
+  ##Transparent OFF
+  LABEL
+    TYPE BITMAP
+    SIZE MEDIUM
+    COLOR 0 0 0
+  END
+  STATUS ON
+END
+
+PROJECTION
+	"proj=lcc"
+   "lon_0=-100"
+   "lat_1=37"
+   "lat_2=65"
+   "ellps=GRS80"
+	#"init=epsg:26714"
+END
+
+##### USGS DRG quad layer (terraserver)r
+    LAYER
+        STATUS off
+        DEBUG ON
+        Transparency 100
+         Offsite 0 0 0
+        NAME USGSQuad
+        METADATA
+            "wms_srs"              "EPSG:26914" #NAD83 UTM zone 14N
+#           "wms_srs"              "AUTO"
+            "wms_name"             "ortho"
+            "wms_server_version"   "1.1.1"
+            "wms_title"            "USGS Digital Ortho-Quadrangles"
+            "wms_format"           "image/png"
+            LYRNAME "DOQs (orthophotos)"
+            LINK "http://terraserver.microsoft.com/about.aspx?n=AboutTerraServiceOverview"
+        END
+        GROUP "BASE DATA"
+        TYPE RASTER
+        MINSCALEdenom 500
+        MAXSCALEdenom 80000
+        CONNECTIONTYPE WMS
+        CONNECTION
+        "http://terraservice.net/ogcmap.ashx?service=WMS&version=1.1.1&request=GetMap&layers=DRG&srs=EPSG:26914&bbox=&width=400&height=300&format=image/png&styles=default"
+     ## "http://terraservice.net/ogcmap.ashx?version=1.1.1&service=wms&LAYERS=DRG&FORMAT=image/png&styles="
+## http://wms.example.com/wms?service=WMS&version=1.1.1&request=GetMap&layers=foo&srs=EPSG:4326&bbox=-180,-90,180,90&format=image/png&width=400&height=300&styles=default
+#      PROJECTION
+#          AUTO
+#           "init=epsg:26914" #NAD83 UTM zone 14N
+#      END
+    END
+#################
+
+###### Oil and Gas Regions
+LAYER
+   Name "regions"
+   Projection
+      "proj=latlong"
+   End
+   CONNECTION "user=bogus password=bogus dbname=geotest"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from regions_noga USING UNIQUE oid USING SRID=-1"
+	TEMPLATE bogus.html
+	TOLERANCE 5
+
+   Type Polygon
+   Status Off
+   METADATA
+      layertype "reference"
+      layerlabel "Oil and Gas Regions"
+      layergroup "ref"
+   END
+   LABELITEM reg_name
+   ClassItem reg_name
+   Class
+      NAME "Colorado Plat, Basin/Range"
+      Expression /Colo.*/
+      #Color 204 255 204
+      Color 0 0 0
+      OutlineColor 0 0 0
+      Size 5
+      Symbol "hashdown"
+      LABEL MINDISTANCE 400 Position CC OFFSET 0 0 BUFFER 1 Color 0 0 0 BACKGROUNDCOLOR 255 255 255 FONT luxisr Size 7 TYPE truetype END
+   End
+   Class
+      NAME "Eastern"
+      Expression /East.*/
+      Color 0 0 0
+      OutlineColor 0 0 0
+      Size 5
+      Symbol "hashvee"
+      LABEL MINDISTANCE 400 Position CC OFFSET 0 0 BUFFER 1 Color 0 0 0 BACKGROUNDCOLOR 255 255 255 FONT luxisr Size 7 TYPE truetype END
+   End
+   Class
+      NAME "Gulf Coast"
+      Expression /Gulf.*/
+      Color 51 204 0
+      OutlineColor 0 0 0
+      Size 3
+      Symbol "hashdown"
+      LABEL MINDISTANCE 400 Position CC OFFSET 0 0 BUFFER 1 Color 0 0 0 BACKGROUNDCOLOR 255 255 255 FONT luxisr Size 7 TYPE truetype END
+   End
+   Class
+      NAME "MMS Lease Blocks"
+      Expression /MMS.*/
+      Color 0 0 0
+      OutlineColor 0 0 0
+      Size 3
+      Symbol "hashdown"
+      LABEL MINDISTANCE 400 Position CC OFFSET 0 0 BUFFER 1 Color 0 0 0 BACKGROUNDCOLOR 255 255 255 FONT luxisr Size 7 TYPE truetype END
+   End
+   Class
+      NAME "Midcontinent"
+      Expression /Mid.*/
+      Color 51 255 51
+      OutlineColor 0 0 0
+      Size 3
+      Symbol "hashdown"
+      LABEL MINDISTANCE 400 Position CC OFFSET 0 0 BUFFER 1 Color 0 0 0 BACKGROUNDCOLOR 255 255 255 FONT luxisr Size 7 TYPE truetype END
+   End
+   Class
+      NAME "Pacific Coast"
+      Expression /Pac.*/
+      Color 255 204 204
+      OutlineColor 0 0 0
+      Size 3
+      Symbol "hashdown"
+      LABEL MINDISTANCE 400 Position CC OFFSET 0 0 BUFFER 1 Color 0 0 0 BACKGROUNDCOLOR 255 255 255 FONT luxisr Size 7 TYPE truetype END
+   End
+   Class
+      NAME "Rocky Mtn and N. Great Plains"
+      Expression /Rock.*/
+      Color 255 153 153
+      OutlineColor 0 0 0
+      Size 3
+      Symbol "hashdown"
+      LABEL MINDISTANCE 400 Position CC OFFSET 0 0 BUFFER 1 Color 0 0 0 BACKGROUNDCOLOR 255 255 255 FONT luxisr Size 7 TYPE truetype END
+   End
+   Class
+      NAME "West Texas and E. New Mexico"
+      Expression /West.*/
+      Color 0 0 0
+      OutlineColor 0 0 0
+      Size 6
+      Symbol "hashdown"
+      LABEL MINDISTANCE 400 Position CC OFFSET 0 0 BUFFER 1 Color 0 0 0 BACKGROUNDCOLOR 255 255 255 FONT luxisr Size 7 TYPE truetype END
+   End
+END
+
+
+### Grid layer for graticules
+LAYER
+  NAME "grid"
+  PROJECTION 
+	  "proj=latlong"
+     #"init=epsg:26714"
+  END
+  METADATA
+      layertype "reference"
+      is_queryable "N"
+      layerlabel "Grid"
+      layergroup "ref"
+  END
+  TYPE LINE
+  STATUS Default
+  CLASS
+	COLOR 204 204 204
+	  LABEL
+		TYPE BITMAP
+		SIZE MEDIUM
+		COLOR 204 204 204
+	  END
+  END
+
+  GRID
+     MINSUBDIVIDE 64
+	  MAXSUBDIVIDE 64
+     MinInterval 5    #.50
+     MaxInterval 5    #.50
+	  LABELFORMAT "DDMM"
+  END
+END 
+
+### Dummy layer for drawing and highlighting
+Layer
+   Name highlight
+   Type LINE
+   Status OFF
+   Class
+      Name "SelectArea"
+      OutlineColor 0 122 222
+   END
+   METADATA
+      layertype "highlight"
+      no_icon "Y"
+   END
+END
+
+
+###### PLSS  Township/Range
+LAYER
+   Status Off
+   Name "twnrng"
+   METADATA
+      is_queryable "N"
+      layertype "reference"
+      layerlabel "Township/Range"
+      layergroup "ref"
+   END
+   CONNECTION "user=bogus password=bogus dbname=geotest"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from (select oid, the_geom,
+         trim(to_char(twn_num,'999'))||twn_dir ||trim(to_char(rng_num,'999'))||rng_dir
+           as trlabel from plss_100k) as named_twnrng USING UNIQUE oid USING SRID=-1"
+   Projection
+		"proj=latlong"
+   End
+   Type Polygon
+   LabelItem "trlabel"
+   MAXSCALEdenom 1000000
+   LABELMAXSCALEdenom 800000
+   Class
+      Name "twnrng"
+      OutlineColor 0 205 0
+      #Color -1 -1 -1
+      LABEL
+         Position CC
+         Size Small
+         Color 0 205 0
+         MINDISTANCE 300
+      END
+   END
+END
+
+###### County Outlines
+LAYER
+   Status Off
+   Name "counties"
+   Projection
+		"proj=latlong"
+   End
+   METADATA
+      is_queryable "N"
+      layertype "reference"
+      layerlabel "County Boundary"
+      layergroup "ref"
+   END
+   CONNECTION "user=bogus password=bogus dbname=geotest"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from (select c.oid as oid, c.the_geom as the_geom,
+         f.cnty_name as county_name from counties_100k c, fips_counties f
+         where c.state_fips = f.state_n_code and c.county_fips = f.cnty_n_code)
+         as named_counties USING UNIQUE oid USING SRID=-1"
+   TYPE polygon
+   LabelItem "county_name"
+   MAXSCALEdenom 25000000
+   LABELMAXSCALEdenom 1400000
+   Class
+      Name "counties"
+      OutlineColor 51 51 51
+      Color -1 -1 -1
+      LABEL
+         Position CC
+         Color 102 102 102
+         FONT regular   ##luxisr
+         Size 10
+         TYPE truetype
+         MINDISTANCE 300
+         PARTIALS false
+      END
+   END
+END
+
+###### Client Seismic Lines
+LAYER
+   Status ON
+   Name "cseis"
+   CONNECTION "user=bogus password=bogus dbname=geotest host=redbud"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from vw_seismic_2d USING UNIQUE oid USING SRID=4326"
+#  DATA "the_geom from (select oid,the_geom,gid,line_id,client_company,survey_date from vw_seismic_2d) as named_seis_2d USING UNIQUE oid USING SRID=4326"
+   Projection
+      "proj=latlong"
+   End
+   Type line
+   METADATA
+      is_queryable "Y"
+      layertype "data"
+      layerlabel "Stick Plot"
+      resultcols "gid,line_id,client_company,survey_date" ## first field must be unique id
+      layergroup "s2d"
+   END
+   Class
+      Name "cseis"
+      STYLE
+          SYMBOL 'circle'
+          #Color  0 45 244
+          Color  205 235 20
+          SIZE 2
+      END
+      LABEL
+         Position UR
+         OFFSET 0 5
+         BUFFER 1
+         Color 0 0 0
+         BACKGROUNDCOLOR 255 255 255
+         FONT luxisr
+         Size 7
+         TYPE truetype
+         ANTIALIAS true
+         ANGLE auto
+         FORCE true
+      END  #label
+   END
+   LabelItem "line_id"
+   LABELMAXSCALEdenom 500000
+	TEMPLATE data/bogus.html
+	TOLERANCE 5
+END
+
+#   ########################################################################
+#   LAYER
+#       NAME save__shotpoint
+#       TYPE point
+#       STATUS off
+#       CONNECTION "user=bogus password=bogus dbname=geotest"
+#       CONNECTIONTYPE postgis
+#       DATA "the_geom from (select gid,the_geom,station_num,angle from shotpoints(xx)) as spts  USING UNIQUE gid USING SRID=-1"
+#       ##FILTER "gid in (21)"
+#       PROJECTION
+#          "proj=latlong"
+#       END
+#      METADATA
+#         is_queryable "N"
+#         layertype "data"
+#         layerlabel "Shotpoints/Receivers"
+#         layergroup "s2d"
+#         sp_interval "10"    ## control sp labels (label interval)
+#      END
+#       MAXSCALE 75000
+#       LABELMAXSCALE 75000
+#       LABELITEM "station_num"
+#       LABELANGLEITEM "angle"
+#       CLASS
+#           Name "shotpoints"
+#           OutlineColor  0 0 0
+#           Color -1 -1 -1
+#           #COLOR 0 0 0
+#           LABEL
+#               POSITION cr   # cl   #lr
+#               OFFSET 0 5
+#               Color 0 0 0
+#               FONT regular   ##luxisr
+#               Size 6
+#               TYPE truetype
+#               FORCE true
+#           END
+#           SYMBOL 'circle'
+#           SIZE 4
+#       END
+#   END
+#
+#   ########################################################################
+    LAYER
+        NAME shotpoint
+        TYPE point
+        STATUS off
+    ## -- The formula: int srid = 33001 + (180+(int)lon_0)/5 *100 + (75+(int)lat_0)/5;
+        CONNECTION "user=bogus password=bogus dbname=giserv"
+        CONNECTIONTYPE postgis
+        #DATA "the_geom from (select gid, oid, sequence_num, station_num, the_geom,
+        #      dfd_GetSeisPointInd(gid, sequence_num, station_num, 10) as plot_ind,
+        #      dfd_GetSeisAngle(gid, sequence_num, 10, 33530) as angle
+        #      from seismic_2d_sp
+        #      where dfd_GetSeisPointInd(gid, sequence_num, station_num, 10) = '0' 
+        #         or indicator = 'B'
+        #      ) as spts USING UNIQUE oid USING SRID=4326"
+        DATA "the_geom from (select gid, oid, sequence_num, station_num, the_geom,
+              dfd_GetSeisPointInd(gid, sequence_num, station_num, 10) as plot_ind,
+              dfd_GetSeisAngle(gid, sequence_num, 10, subs_mapsrid) as angle
+              from seismic_2d_sp
+              where dfd_GetSeisPointInd(gid, sequence_num, station_num, 10) = '0'
+                 or indicator = 'B'
+              ) as spts USING UNIQUE oid USING SRID=4326"
+        ##FILTER "gid in (21)"
+        PROJECTION
+           "proj=latlong"
+        END
+       METADATA
+          is_queryable "N"
+          layertype "data"
+          layerlabel "Shotpoints/Receivers"
+          layergroup "s2d"
+          sp_interval "10"    ## control sp labels (label interval)
+          subs_mapsrid "1"
+       END
+        MAXSCALEdenom 75000
+   #    LABEL
+   #        ANGLE [angle]
+   #    END
+        LABELMAXSCALEdenom 75000
+        LABELITEM "station_num"
+   ###  LABELANGLEITEM "angle"
+        CLASS
+            Name "shotpoints"
+            OutlineColor  0 0 0
+            Color -1 -1 -1
+            #COLOR 0 0 0
+            LABEL
+                POSITION cr   # cl   #lr
+                OFFSET 0 5
+                Color 0 0 0
+                FONT regular   ##luxisr
+                Size 6
+                TYPE truetype
+                FORCE true
+                ANGLE [angle]
+            END
+            SYMBOL 'circle'
+            SIZE 4
+        END
+    END
+    ########################################################################
+
+###### Streams and Rivers
+LAYER
+   STATUS on
+   NAME "streams"
+   METADATA
+      is_queryable "N"
+      layertype "reference"
+      layerlabel "Streams and Rivers"
+      layergroup "ref"
+   END
+   CONNECTION "user=bogus password=bogus dbname=geotest"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from hydrogl USING UNIQUE oid USING SRID=-1"
+   Projection
+		"proj=latlong"
+   End
+   TOLERANCE 5
+   MAXSCALEdenom 4000000   ##MaxScale 2260000
+   Type Line
+   LABELITEM "name"
+   #Filter "feature='Stream'"
+   Class
+      Name "Streams"
+      Color 0 0 255
+      LABEL
+         TYPE truetype
+         FONT luxisri
+         Position CR
+         Size 7
+         Color 0 0 255
+         MINDISTANCE 400
+         ANGLE auto
+      END
+   END
+END
+
+###### Lakes
+LAYER
+   Status Off
+   Name "lakes"
+   METADATA
+      is_queryable "N"
+      layertype "reference"
+      layerlabel "Lakes"
+      layergroup "ref"
+   END
+   CONNECTION "user=bogus password=bogus dbname=geotest"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from hydrogp USING UNIQUE oid USING SRID=-1"
+   Projection
+		"proj=latlong"
+   End
+   MAXSCALEdenom 4000000
+   Type Polygon
+   LabelItem "name"
+   Filter "feature in ('Lake','Resevoir','Stream','Canal')"
+   Class
+      Name "Lakes"
+      Color 0 0 255
+      LABEL
+         TYPE truetype
+         FONT luxisri
+         Position CR
+         Size 7
+         Color 0 0 255
+      END
+   END
+END
+
+
+###### State Outlines
+LAYER
+   STATUS DEFAULT
+   Name "states"
+   METADATA
+      is_queryable "N"
+      layertype "reference"
+      layerlabel "State Boundary"
+      layergroup "ref"
+   END
+   CONNECTION "user=bogus password=bogus dbname=geotest"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from (select c.oid as oid, c.the_geom as the_geom,
+         f.state_name as state_name from states_100k c, fips_states f
+         where c.state_fips = f.state_n_code)
+         as named_states USING UNIQUE oid USING SRID=-1"
+   #DATA "the_geom from (select c.oid as oid, c.the_geom as the_geom,
+   #      label_long as state_name from states_100k c)
+   #      as named_states USING UNIQUE oid USING SRID=-1"
+   Projection
+		"proj=latlong"
+   End
+   TYPE line
+   Transparency 20
+   #LabelItem "state_name"
+   LABELMAXSCALEdenom 13500000
+   Class
+      Name "states"
+      OutlineColor 0 0 0
+      #Color 239 215 200
+      COLOR -1 -1 -1
+      SYMBOL 'circle'
+      SIZE 2
+      LABEL
+         Position CC
+         Color 0 0 0
+         FONT luxisri
+         Size 11
+         TYPE truetype
+         MINDISTANCE 300
+         PARTIALS false
+      END
+   END
+END
+
+LAYER
+    STATUS off
+    PROJECTION "proj=latlong" END
+    METADATA
+        layertype "data"
+        layerlabel "Soil Samples"
+        is_queryable "Y"
+        layergroup "sol"
+        resultcols "gid,al_pct,as_ppm,fe_pct,k_pct,u_fl_ppm" ## first field must be unique id
+    END
+    NAME samples
+    TEMPLATE data/samples.html
+    CONNECTION "user=bogus password=bogus dbname=geotest"
+    CONNECTIONTYPE postgis
+        DATA "the_geom from seds USING UNIQUE oid USING SRID=-1"
+        TYPE POINT
+        TOLERANCE 5
+        ##SymbolScale 500000
+    LABELITEM as_ppm
+    CLASS
+        SYMBOL "filltri" Size 6
+        NAME "Samples"
+        COLOR 225 0 0
+        LABEL
+            POSITION LR
+            SIZE Small
+            COLOR 255 0 0
+        END
+    END
+END
+
+QueryMap
+	##Color 51 255 0
+    Color 255 99 71
+   Status ON
+	Style Hilite
+End
+	
+Reference
+	Status on
+	Image "imagedir/refmap.png"
+   SIZE 189 131
+   Extent -6933828.0 2281916.0 4413300.0 10142311.0
+	Color -1 -1 -1
+	OutlineColor 255 0 0
+END
+
+
+END # Map File

@@ -1,0 +1,138 @@
+### ---------------------------------------------------------------------
+### $Id: seis_dummy.map,v 1.1.1.1 2007/04/24 02:04:19 rob Exp $
+### $Name:  $
+### ---------------------------------------------------------------------
+MAP
+
+NAME seis_976
+STATUS ON
+SIZE 650 450
+#IMAGECOLOR 210 228 229
+#IMAGECOLOR -1 -1 -1
+SYMBOLSET marker.sym
+FONTSET "fonts/fonts.lst"
+
+#       minx     miny     maxx    maxy
+#         W        S       E       N
+Extent 591295.711111 3999781.813248 1027984.322222 4302104.697863
+UNITS METERS
+
+
+# Start of web interface definition
+WEB
+#temp data absolute path:
+  #IMAGEPATH /usr/local/www/data/tmpdata/   # redbud
+  IMAGEPATH /data1/www/data/tmpdata/   # ursus
+#temp data relative path:
+  IMAGEURL "/tmpdata/"
+# max/min zoom:
+  MINSCALE 2000
+  MAXSCALE 54000000
+
+END # Web
+
+#OUTPUTFORMAT
+#  NAME png24bit
+#  DRIVER "GD/PNG"
+#  MIMETYPE "image/png"
+#  #IMAGEMODE RGB
+#  IMAGEMODE RGBA
+#  TRANSPARENT true
+#END
+OUTPUTFORMAT
+    NAME gif
+    DRIVER "GD/GIF"
+    MIMETYPE "image/gif"
+    IMAGEMODE PC256
+    #IMAGEMODE RGBA
+    EXTENSION "gif"
+    TRANSPARENT on
+END
+
+
+PROJECTION
+	"proj=lcc"
+   "lon_0=-100"
+   "lat_1=37"
+   "lat_2=65"
+   "ellps=GRS80"
+	#"init=epsg:26714"
+END
+
+###### Client Seismic Lines
+LAYER
+   Status ON
+   Name "cseis"
+   CONNECTION "user=rob password=rob dbname=geotest host=redbud"
+   CONNECTIONTYPE postgis
+   DATA "the_geom from vw_seismic_2d USING UNIQUE oid USING SRID=4326"
+   FILTER "gid=976"
+   Projection
+      "proj=latlong"
+   End
+   Type line
+   METADATA
+      is_queryable "Y"
+      layertype "data"
+      layerlabel "2D Seismic Lines"
+      resultcols "gid,line_id,client_company,survey_date" ## first field must be unique id
+   END
+   Class
+      Name "cseis"
+      STYLE
+          SYMBOL 'circle'
+          Color  173 12 152
+          SIZE 3
+      END
+
+      LABEL
+         Position UR
+         OFFSET 0 5
+         BUFFER 1
+         Color 0 0 0
+         BACKGROUNDCOLOR 255 255 255
+         FONT luxisr
+         Size 7
+         TYPE truetype
+         ANTIALIAS true
+         ANGLE auto
+         FORCE true
+      END  #label
+   END
+   LABELITEM "line_id"
+	TEMPLATE data/bogus.html
+	TOLERANCE 5
+END
+
+    LAYER
+        STATUS off
+        PROJECTION "proj=latlong" END
+        METADATA
+            layertype "data"
+            layerlabel "Soil Samples"
+            is_queryable "Y"
+            layergroup "sol"
+        END
+        NAME samples
+        TEMPLATE data/samples.html
+        CONNECTION "user=bogus password=bogus dbname=geotest"
+        CONNECTIONTYPE postgis
+        DATA "the_geom from seds USING UNIQUE oid USING SRID=-1"
+        TYPE POINT
+        TOLERANCE 5
+        ##SymbolScale 500000
+        LABELITEM as_ppm
+        CLASS
+            SYMBOL "filltri" Size 6
+            NAME "Samples"
+            COLOR 225 0 0
+            STYLE
+                SYMBOL 'circle'
+                Color  -1 -1 -1
+                OUTLINECOLOR 0 255 0
+                SIZE 13
+            END
+        END
+    END
+
+END # Map File

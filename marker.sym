@@ -1,0 +1,99 @@
+###  $Id: marker.sym,v 1.1.1.1 2007/04/24 02:04:24 rob Exp $
+###
+###------------------------------------------------------
+SYMBOL
+  NAME "x"
+  TYPE vector
+  POINTS
+    0 4
+    4 0
+    -99 -99
+    4 4
+    0 0
+  END
+END
+SYMBOL
+  NAME "cross"
+  TYPE vector
+  POINTS
+    2 0
+    2 4
+    -99 -99
+    0 2
+    4 2
+  END
+END
+SYMBOL
+  NAME "triangle"
+  TYPE vector
+  POINTS
+    0 4
+    2 0
+    4 4
+    0 4
+  END
+END
+SYMBOL
+  NAME "filltri"
+  TYPE vector
+  POINTS
+    0 4
+    2 0
+    4 4
+    0 4
+  END
+   Filled TRUE
+END
+SYMBOL
+  NAME 'circle'
+  TYPE ELLIPSE
+  POINTS 1 1 END
+  FILLED TRUE
+END
+				
+SYMBOL     # cannot get this one to work
+  NAME 'railway'
+  TYPE truetype
+  FONT arial
+  CHARACTER "|"
+  GAP 25 # distance between symbols
+END
+
+
+  Symbol
+    NAME 'line'
+    TYPE ellipse
+    FILLED true
+      POINTS
+        1 1
+      END
+  END
+
+  Symbol
+    NAME 'tie'
+    TYPE Ellipse
+    FILLED TRUE
+    POINTS 1 1 END
+    STYLE 1 3 END
+  END
+
+symbol
+  name "hashdown"
+  type vector
+  transparent 0
+  points
+    0 1
+    1 0
+  end
+end
+
+symbol
+  name "hashvee"
+  type vector
+  transparent 0
+  points
+    0 1
+    1 0
+    2 1
+  end
+end

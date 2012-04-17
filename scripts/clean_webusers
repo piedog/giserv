@@ -1,0 +1,29 @@
+#!/bin/sh
+
+############################################################################
+##  $Id: clean_webusers,v 1.1.1.1 2007/04/24 02:04:37 rob Exp $
+##  $Name:  $
+############################################################################
+
+##select session_id,password,ip, exp_date,age(exp_date) from web_users where age(exp_date) > '1 day';
+
+if [ $# -gt 0 -a "X${1}" = "X-h" ]; then
+    echo "usage:   clean_webusers [ n ]       (where n is number of days_"
+    exit 1;
+elif [ $# -eq 0 ]; then
+    N=1
+else
+    N=$1
+fi
+echo "Deleting all user records in web_users greater than $N days"
+
+Psql="psql --username rob --dbname geotest --host redbud"
+Sql="delete from web_users where age(exp_date) > '$N day';"
+${Psql} --command "$Sql"
+echo "    ($Sql)"
+echo ""
+
+Sql="select session_id,password,ip, exp_date,age(exp_date) from web_users;"
+${Psql} --command "$Sql"
+
+exit 0

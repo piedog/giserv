@@ -1,0 +1,19 @@
+.mainstyle {
+    font-size: 13px;
+    color: #333333;
+    background-color: #efefef;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    text-decoration: none
+    padding: 10%;
+    margin: 10%;
+}
+h3 {
+    color: #000000;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    font-size: 15px;
+}
+.emph {
+    font-weight: bold;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+}
